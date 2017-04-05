@@ -5,27 +5,36 @@
         "iot_hub_name": {
             "type": "string"
         },
-        "app_insight_name": {
+        "app_insights_name": {
+            "type": "string"
+        },
+        "ai_location": {
+            "type": "string",
+            "allowedValues": [
+                "East US",
+                "North Europe",
+                "South Central US",
+                "West Europe"
+            ],
+            "metadata": {
+                "description": "Location for Appliation Insights"
+            }
+        },
+        "storage_account_name":{
             "type": "string"
         },
         "func_app_name": {
             "type": "string"
-        },
-        "func_app_plan_name": {
-            "type": "string"
-        },
-        "func_apps_site_name": {
-            "type": "string"
-        },
-        "location": {
-            "type": "string"
-        },
-        "ai_location": {
-            "type": "string"
         }
     },
     "variables": {
-        "StorageAccountName": "[parameters('func_app_name')]"
+        "iotHubName": "[parameters('iot_hub_name')]",
+        "appInsightsName" : "[parameters('app_insights_name')]",
+        "appInsightsLocation" : "[parameters('ai_location')]",
+        "funcAppName": "[parameters('func_app_name')]",
+        "hostingPlanName": "[parameters('func_app_name')]",
+        "funcAppsSiteName": "[parameters('func_app_name')]",
+        "storageAccountName": "[parameters('storage_account_name')]"
     },
     "resources": [
         {
@@ -35,9 +44,9 @@
                 "tier": "Free",
                 "capacity": 1
             },
-            "name": "[parameters('iot_hub_name')]",
+            "name": "[variables('iotHubName')]",
             "apiVersion": "2016-02-03",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "tags": {},
             "properties": {
                 "eventHubEndpoints": {
@@ -54,12 +63,12 @@
         {
             "type": "microsoft.insights/components",
             "kind": "other",
-            "name": "[parameters('app_insight_name')]",
+            "name": "[variables('appInsightsName')]",
             "apiVersion": "2014-04-01",
-            "location": "[parameters('ai_location')]",
+            "location": "[variables('appInsightsLocation')]",
             "tags": {},
             "properties": {
-                "ApplicationId": "[parameters('app_insight_name')]"
+                "ApplicationId": "[variables('appInsightsName')]"
             },
             "dependsOn": []
         },
@@ -70,9 +79,9 @@
                 "tier": "Standard"
             },
             "kind": "Storage",
-            "name": "[parameters('func_app_name')]",
+            "name": "[variables('storageAccountName')]",
             "apiVersion": "2016-01-01",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "tags": {},
             "properties": {},
             "dependsOn": []
@@ -87,11 +96,11 @@
                 "capacity": 0
             },
             "kind": "functionapp",
-            "name": "[parameters('func_app_plan_name')]",
+            "name": "[variables('funcAppName')]",
             "apiVersion": "2015-08-01",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
-                "name": "[parameters('func_app_plan_name')]",
+                "name": "[variables('funcAppName')]",
                 "numberOfWorkers": 0
             },
             "dependsOn": []
@@ -99,58 +108,65 @@
         {
             "type": "Microsoft.Web/sites",
             "kind": "functionapp",
-            "name": "[parameters('func_apps_site_name')]",
+            "name": "[variables('funcAppsSiteName')]",
             "apiVersion": "2015-08-01",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
-                "name": "[parameters('func_apps_site_name')]",
+                "name": "[variables('funcAppsSiteName')]",
                 "siteConfig": {
                     "appSettings": [
                         {
                             "name": "AzureWebJobsDashboard",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('StorageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]"
                         },
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('StorageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[concat(toLower(variables('funcAppName')),'azfunccontents')]"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~1"
                         },
                         {
-                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('StorageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[concat(toLower(parameters('func_apps_site_name')), 'IoTFunc')]"
-                        },
-                        {
                             "name": "WEBSITE_NODE_DEFAULT_VERSION",
                             "value": "6.5.0"
                         }
                     ]
-                },                
+                },
+                "hostNames": [
+                    "[concat(variables('funcAppsSiteName'),'.azurewebsites.net')]"
+                ],
+                "enabledHostNames": [
+                    "[concat(variables('funcAppsSiteName'),'.azurewebsites.net')]",
+                    "[concat(variables('funcAppsSiteName'),'.scm.azurewebsites.net')]"
+                ],
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(parameters('func_apps_site_name'),'.azurewebsites.net')]",
+                        "name": "[concat(variables('funcAppsSiteName'),'.azurewebsites.net')]",
                         "sslState": 0,
                         "thumbprint": null,
                         "ipBasedSslState": 0
                     },
                     {
-                        "name": "[concat(parameters('func_apps_site_name'),'.scm.azurewebsites.net')]",
+                        "name": "[concat(variables('funcAppsSiteName'),'.scm.azurewebsites.net')]",
                         "sslState": 0,
                         "thumbprint": null,
                         "ipBasedSslState": 0
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('func_app_plan_name'))]"
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('func_app_plan_name'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('func_app_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ]
         }
     ]
