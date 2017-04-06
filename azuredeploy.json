@@ -2,6 +2,38 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "resourceLocation": {
+            "type": "string",
+            "allowedValues": [
+                "East Asia",
+                "Southeast Asia",
+                "Central US",
+                "East US",
+                "East US 2",
+                "West US",
+                "North Central US",
+                "South Central US",
+                "North Europe",
+                "West Europe",
+                "Japan West",
+                "Japan East",
+                "Brazil South",
+                "Australia East",
+                "Australia Southeast",
+                "Central India",
+                "West India",
+                "South India",
+                "Canada Central",
+                "Canada East",
+                "West Central US",
+                "West US 2",
+                "UK South",
+                "UK West",
+                "Korea Central",
+                "Korea South"
+            ],
+            "defaultValue": "East Asia"
+        },
         "iotHubName": {
             "type": "string"
         },
@@ -53,6 +85,7 @@
         }
     },
     "variables": {
+        "resourceLocation": "[parameters('resourceLocation')]",
         "iotHubName": "[parameters('iotHubName')]",
         "iotHubSku": "[parameters('iotHubSku')]",
         "iotHubCapacity": "[parameters('iotHubCapacity')]",
@@ -75,7 +108,7 @@
             },
             "name": "[variables('iotHubName')]",
             "apiVersion": "2016-02-03",
-            "location": "[resourceGroup().location]",
+            "location": "[variables('resourceLocation')]",
             "tags": {},
             "properties": {
                 "eventHubEndpoints": {
@@ -133,7 +166,7 @@
             "apiVersion":"2015-08-01",
             "name":"[variables('eventhubNamespace')]",
             "type":"Microsoft.EventHub/namespaces",
-            "location":"[resourceGroup().location]",
+            "location":"[variables('resourceLocation')]",
             "sku":{  
                 "name":"Standard",
                 "tier":"Standard"
@@ -172,7 +205,7 @@
             "kind": "Storage",
             "name": "[variables('storageAccountName')]",
             "apiVersion": "2016-01-01",
-            "location": "[resourceGroup().location]",
+            "location": "[variables('resourceLocation')]",
             "tags": {},
             "properties": {},
             "dependsOn": []
@@ -189,7 +222,7 @@
             "kind": "functionapp",
             "name": "[variables('functionAppName')]",
             "apiVersion": "2015-08-01",
-            "location": "[resourceGroup().location]",
+            "location": "[variables('resourceLocation')]",
             "properties": {
                 "name": "[variables('functionAppName')]",
                 "numberOfWorkers": 0
@@ -201,7 +234,7 @@
             "kind": "functionapp",
             "name": "[variables('funcAppsSiteName')]",
             "apiVersion": "2015-08-01",
-            "location": "[resourceGroup().location]",
+            "location": "[variables('resourceLocation')]",
             "properties": {
                 "name": "[variables('funcAppsSiteName')]",
                 "siteConfig": {
