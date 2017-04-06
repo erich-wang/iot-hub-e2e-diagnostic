@@ -51,10 +51,6 @@
             "minValue": 1,
             "defaultValue": 1
         },
-        "appInsightsName": {
-            "type": "string",
-            "defaultValue": "[concat('ai', uniquestring(resourceGroup().id))]"
-        },
         "appInsightsLocation": {
             "type": "string",
             "allowedValues": [
@@ -68,18 +64,6 @@
                 "description": "Location for Appliation Insights"
             }
         },
-        "eventHubNamespace": {
-            "type": "string",
-            "defaultValue": "[concat('eventhub', uniquestring(resourceGroup().id))]"
-        },
-        "storageAccountName":{
-            "type": "string",
-            "defaultValue": "[concat('storage', uniquestring(resourceGroup().id))]"
-        },
-        "functionAppName": {
-            "type": "string",
-            "defaultValue": "[concat('function', uniquestring(resourceGroup().id))]"
-        },
         "repoUrl": {
             "type": "string"
         }
@@ -89,14 +73,14 @@
         "iotHubName": "[parameters('iotHubName')]",
         "iotHubSku": "[parameters('iotHubSku')]",
         "iotHubCapacity": "[parameters('iotHubCapacity')]",
-        "appInsightsName": "[parameters('appInsightsName')]",
+        "appInsightsName": "[concat('ai', uniquestring(resourceGroup().id))]",
         "appInsightsLocation": "[parameters('appInsightsLocation')]",
-        "eventHubNamespace": "[parameters('eventHubNamespace')]",
+        "eventHubNamespace": "[concat('eventhub', uniquestring(resourceGroup().id))]",
         "eventhubResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules', variables('eventhubNamespace'), 'RootManageSharedAccessKey')]",
-        "functionAppName": "[parameters('functionAppName')]",
-        "hostingPlanName": "[parameters('functionAppName')]",
-        "funcAppsSiteName": "[parameters('functionAppName')]",
-        "storageAccountName": "[parameters('storageAccountName')]",
+        "functionAppName": "[concat('function', uniquestring(resourceGroup().id))]",
+        "hostingPlanName": "[concat('function', uniquestring(resourceGroup().id))]",
+        "funcAppsSiteName": "[concat('function', uniquestring(resourceGroup().id))]",
+        "storageAccountName": "[concat('storage', uniquestring(resourceGroup().id))]",
         "repoUrl": "[parameters('repoUrl')]"
     },
     "resources": [
