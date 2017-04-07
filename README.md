@@ -1,0 +1,1 @@
+[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fgithub.com%2FVSChina%2Fiot-hub-e2e-diagnostic%2Fazuredeploy.json)
