@@ -1,0 +1,13 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "diagnostics",
+      "direction": "in",
+      "path": "insights-metrics-pt1m",
+      "connection": "DIAG_ENDPOINT",
+      "consumerGroup": "$Default"
+    }
+  ],
+  "disabled": false
+}
