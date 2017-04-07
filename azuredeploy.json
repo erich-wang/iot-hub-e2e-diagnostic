@@ -33,7 +33,8 @@
             }
         },
         "repoUrl": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "https://github.com/VSChina/iot-hub-e2e-diagnostic"
         }
     },
     "variables": {
