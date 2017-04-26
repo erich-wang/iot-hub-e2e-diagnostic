@@ -2,23 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "iotHubName": {
-            "type": "string"
-        },
-        "iotHubSku": {
-            "type": "string",
-            "allowedValues": [
-                "F1",
-                "S1",
-                "S2"
-            ],
-            "defaultValue": "F1"
-        },
-        "iotHubCapacity": {
-            "type": "int",
-            "minValue": 1,
-            "defaultValue": 1
-        },
         "appInsightsLocation": {
             "type": "string",
             "allowedValues": [
@@ -39,9 +22,6 @@
     },
     "variables": {
         "resourceLocation": "[resourceGroup().location]",
-        "iotHubName": "[parameters('iotHubName')]",
-        "iotHubSku": "[parameters('iotHubSku')]",
-        "iotHubCapacity": "[parameters('iotHubCapacity')]",
         "appInsightsName": "[concat('ai', uniquestring(resourceGroup().id))]",
         "appInsightsLocation": "[parameters('appInsightsLocation')]",
         "eventHubNamespace": "[concat('eventhub', uniquestring(resourceGroup().id))]",
@@ -53,56 +33,6 @@
         "repoUrl": "[parameters('repoUrl')]"
     },
     "resources": [
-        {
-            "type": "Microsoft.Devices/IotHubs",
-            "sku": {
-                "name": "[variables('iotHubSku')]",
-                "capacity": "[variables('iotHubCapacity')]"
-            },
-            "name": "[variables('iotHubName')]",
-            "apiVersion": "2016-02-03",
-            "location": "[variables('resourceLocation')]",
-            "tags": {},
-            "properties": {
-                "eventHubEndpoints": {
-                    "events": {
-                        "retentionTimeInDays": 1,
-                        "partitionCount": 2
-                    }
-                },
-                "routing": {
-                    "endpoints": {
-                        "eventHubs": [
-                            {
-                                "connectionString": "[concat(listkeys(variables('eventhubResourceId'), '2015-08-01').primaryConnectionString, ';EntityPath=d2c-diagnostics')]",
-                                "name": "diagnostics",
-                                "subscriptionId": "[subscription().subscriptionId]",
-                                "resourceGroup": "[resourceGroup().name]"
-                            }
-                        ]
-                    },
-                    "routes": [
-                        {
-                            "name": "Events",
-                            "source": "DeviceMessages",
-                            "endpointNames": ["events"],
-                            "isEnabled": true
-                        },
-                        {
-                            "name": "Diagnostics",
-                            "source": "DeviceMessages",
-                            "endpointNames": ["diagnostics"],
-                            "isEnabled": true
-                        }
-                    ]
-                },
-                "enableFileUploadNotifications": false,
-                "features": "None"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.EventHub/namespaces', variables('eventhubNamespace'))]"
-            ]
-        },
         {
             "type": "microsoft.insights/components",
             "kind": "other",
