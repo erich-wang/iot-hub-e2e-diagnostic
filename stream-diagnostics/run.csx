@@ -16,7 +16,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 
-public static void Run(EventData myEventHubMessage, TraceWriter log)
+public static void Run(EventData d2cMessage, TraceWriter log)
 {
     TelemetryClient telemetry = new TelemetryClient();
     telemetry.InstrumentationKey = System.Environment.GetEnvironmentVariable("APP_INSIGHTS_INSTRUMENTATION_KEY");
@@ -27,7 +27,7 @@ public static void Run(EventData myEventHubMessage, TraceWriter log)
     const string iotHubKey = "IoTHub";
 
     bool validMessage = false;
-    var message = Encoding.UTF8.GetString(myEventHubMessage.GetBytes());
+    var message = Encoding.UTF8.GetString(d2cMessage.GetBytes());
     var serializer = new JavaScriptSerializer();
     var properties = serializer.Deserialize<Dictionary<string, object>>(message);
 
