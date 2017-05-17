@@ -3,13 +3,22 @@ This tutorial will desmonstrate how to enable end-to-end diagnostic in a full-st
 
 In this tutorial, you will learn:
 * IoT Hub solution architecture
-* Setup brand new IoT Hub solution
+* Setup brand new IoT Hub solution with end-to-end diagnostics
 * Setup IoT Hub solution based on existing IoT Hub and Stream Analytics
 
-## Full-stack IoT Hub solution architecture
-FIGURE PALCEHOLDER
+## Prerequisite
+We suppose you had Azure account already, if not, please first [create Azure account](https://azure.microsoft.com/en-us/free/).
 
-## Setup brand new IoT Hub solution
+## Full-stack IoT Hub solution architecture
+The following figure gives one typical IoT Hub solution architecture:
+![](./IoTHubSolution.png)
+To enable end-to-end diagnostics in the above IoT Hub solution, a few resources should be provisioned. The following figure demonstrates new solution architecture with end-to-end diagnostics support:
+![](./IoTHubSolution_E2EDiag.png)
+
+## Setup brand new IoT Hub solution with e2e diagnostics
+1. Navigate to [brand new IoT Hub solution branch](https://github.com/VSChina/iot-hub-e2e-diagnostic/tree/netnew_armtemplate)
+2. Click **Deploy to Azure**
+3. [TODO Update AI API Key]
 
 ## Setup IoT Hub solution based on existing IoT Hub and Stream Analytics
 ### Modifying existing IoT Hub
